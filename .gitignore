@@ -2,3 +2,8 @@
 *.key
 notes.md
 Caddyfile
+notes.txt
+*.sql
+*.dump
+config_local.yml
+sql_query_notes.txt

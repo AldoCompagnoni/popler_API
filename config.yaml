@@ -4,8 +4,8 @@ caching:
 db:
   adapter: postgresql
   encoding: utf8
-  host: localhost
-  username: REPLACE_ME
-  password: REPLACE_ME
+  host: postgres
+  username: power_user
+  password: popler
   port: 5432
-  database: DATABASE_NAME
+  database: popler_3

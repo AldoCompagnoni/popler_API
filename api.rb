@@ -1,9 +1,21 @@
-require 'rubygems'
+require 'bundler/setup'
+%w(yaml json csv digest).each { |req| require req }
+Bundler.require(:default)
 require 'sinatra'
 require 'multi_json'
 require "sinatra/multi_route"
 require 'yaml'
 require "pg"
+require 'active_record'
+require 'active_support'
+
+require_relative 'funs'
+require_relative "models"
+
+$config = YAML::load_file(File.join(__dir__, ENV['RACK_ENV'] == 'test' ? 'test_config.yaml' : 'config.yaml'))
+ActiveSupport::Deprecation.silenced = true
+ActiveRecord::Base.establish_connection($config['db'])
+ActiveRecord::Base.logger = Logger.new(STDOUT)
 
 class PopAPI < Sinatra::Application
   register Sinatra::MultiRoute
@@ -19,8 +31,8 @@ class PopAPI < Sinatra::Application
 
   ## configuration
   configure do
-    set :raise_errors, false
-    set :show_exceptions, false
+    set :raise_errors, true
+    set :show_exceptions, true
     set :strict_paths, false
     set :server, :puma
     set :protection, :except => [:json_csrf]
@@ -47,6 +59,21 @@ class PopAPI < Sinatra::Application
       headers "Access-Control-Allow-Origin" => "*"
       cache_control :public, :must_revalidate, :max_age => 60
     end
+
+    def serve_data(ha, data)
+      # puts '[CONTENT_TYPE]'
+      # puts request.env['CONTENT_TYPE'].nil?
+      case request.env['CONTENT_TYPE']
+      when 'application/json'
+        ha.to_json
+      when 'text/csv'
+        to_csv(data)
+      when nil
+        ha.to_json
+      else
+        halt 415, { error: 'Unsupported media type', message: 'supported media types are application/json and text/csv; no Content-type equals application/json' }.to_json
+      end
+    end
   end
 
   ## routes
@@ -57,7 +84,7 @@ class PopAPI < Sinatra::Application
 
   get '/docs' do
     headers_get
-    redirect 'https://github.com/ropensci/cchecksapi/blob/master/docs/api_docs.md', 301
+    redirect 'https://github.com/AldoCompagnoni/popler_API', 301
   end
 
   get "/heartbeat" do
@@ -67,47 +94,34 @@ class PopAPI < Sinatra::Application
       "routes" => [
         "/docs (GET)",
         "/heartbeat (GET)",
-        "/pkgs (GET)"
+        "/biomass (GET)",
+        "/search (GET)"
       ]
     })
   end
 
-  get '/pkgs' do
+  get '/biomass' do
     headers_get
-    { hello: "world" }.to_json
-    # begin
-    #   %i(limit offset).each do |p|
-    #     unless params[p].nil?
-    #       begin
-    #         params[p] = Integer(params[p])
-    #       rescue ArgumentError
-    #         raise Exception.new("#{p.to_s} is not an integer")
-    #       end
-    #     end
-    #   end
-    #   lim = (params[:limit] || 10).to_i
-    #   off = (params[:offset] || 0).to_i
-    #   raise Exception.new('limit too large (max 1000)') unless lim <= 1000
-    #   d = $cks.find({}, {"limit" => lim, "skip" => off})
-    #   dat = d.to_a
-    #   raise Exception.new('no results found') if d.nil?
-    #   { found: d.count, count: dat.length, offset: nil, error: nil,
-    #     data: dat }.to_json
-    # rescue Exception => e
-    #   halt 400, { count: 0, error: { message: e.message }, data: nil }.to_json
-    # end
+    begin
+      data = Biomass.endpoint(params)
+      raise Exception.new('no results found') if data.length.zero?
+      ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
+      serve_data(ha, data)
+    rescue Exception => e
+      halt 400, { count: 0, returned: 0, data: nil, error: { message: e.message }}.to_json
+    end
   end
 
-  get '/pkgs/:name' do
+  get '/search' do
     headers_get
-    { hello: "world" }.to_json
-    # begin
-    #   d = $cks.find({ package: params[:name] }).first
-    #   raise Exception.new('no results found') if d.nil?
-    #   { error: nil, data: d }.to_json
-    # rescue Exception => e
-    #   halt 400, { error: { message: e.message }, data: nil }.to_json
-    # end
+    begin
+      data = Search.endpoint(params)
+      raise Exception.new('no results found') if data.length.zero?
+      ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
+      serve_data(ha, data)
+    rescue Exception => e
+      halt 400, { count: 0, returned: 0, data: nil, error: { message: e.message }}.to_json
+    end
   end
 
   # prevent some HTTP methods
