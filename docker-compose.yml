@@ -1,5 +1,12 @@
 version: '2.1'
 services:
+  redis:
+    image: redis
+    restart: always
+    volumes:
+      - $HOME/data/redis:/data
+    command:  redis-server --appendonly yes
+
   postgres:
     image: postgres:latest
     ports:
@@ -21,7 +28,8 @@ services:
     build: .
     ports:
       - "8834:8834"
-    links:
+    networks:
+      - redis
       - postgres
     depends_on:
       postgres:
@@ -30,3 +38,7 @@ services:
 # create volumes if they don't exist already
 volumes: 
   db_volume:
+
+networks:
+  redis: 
+  postgres:   
