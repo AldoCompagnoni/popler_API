@@ -181,6 +181,7 @@ class PopAPI < Sinatra::Application
   get '/search' do
     headers_get
     begin
+      raise Exception.new('proj_metadata_key is a required parameter') unless !params[:proj_metadata_key].nil?
       data = Search.endpoint(params)
       raise Exception.new('no results found') if data.length.zero?
       ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
