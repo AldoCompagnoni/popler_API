@@ -13,7 +13,7 @@ require_relative 'funs'
 require_relative "models"
 
 # feature flag: toggle redis
-$use_redis = true
+$use_redis = false
 
 $redis = Redis.new host: ENV.fetch('REDIS_PORT_6379_TCP_ADDR', 'localhost'),
                    port: ENV.fetch('REDIS_PORT_6379_TCP_PORT', 6379)
@@ -68,8 +68,8 @@ class PopAPI < Sinatra::Application
 
   ## configuration
   configure do
-    set :raise_errors, true
-    set :show_exceptions, true
+    set :raise_errors, false
+    set :show_exceptions, false
     set :strict_paths, false
     set :server, :puma
     set :protection, :except => [:json_csrf]
@@ -131,18 +131,45 @@ class PopAPI < Sinatra::Application
       "routes" => [
         "/docs (GET)",
         "/heartbeat (GET)",
-        "/biomass (GET)",
-        "/search (GET)",
-        "/summary (GET)"
+        # "/biomass (GET)",
+        "/summary (GET)",
+        "/search (GET)"
       ]
     })
   end
 
   # routes for testing
-  get '/biomass' do
+  # get '/biomass' do
+  #   headers_get
+  #   begin
+  #     data = Biomass.endpoint(params)
+  #     raise Exception.new('no results found') if data.length.zero?
+  #     ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
+  #     serve_data(ha, data)
+  #   rescue Exception => e
+  #     halt 400, { count: 0, returned: 0, data: nil, error: { message: e.message }}.to_json
+  #   end
+  # end
+
+  # get '/search' do
+  #   headers_get
+  #   begin
+  #     data = Search.endpoint(params)
+  #     raise Exception.new('no results found') if data.length.zero?
+  #     ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
+  #     serve_data(ha, data)
+  #   rescue Exception => e
+  #     halt 400, { count: 0, returned: 0, data: nil, error: { message: e.message }}.to_json
+  #   end
+  # end
+
+
+
+  # real routes
+  get '/summary' do
     headers_get
     begin
-      data = Biomass.endpoint(params)
+      data = Summary.endpoint(params)
       raise Exception.new('no results found') if data.length.zero?
       ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
       serve_data(ha, data)
@@ -155,21 +182,6 @@ class PopAPI < Sinatra::Application
     headers_get
     begin
       data = Search.endpoint(params)
-      raise Exception.new('no results found') if data.length.zero?
-      ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
-      serve_data(ha, data)
-    rescue Exception => e
-      halt 400, { count: 0, returned: 0, data: nil, error: { message: e.message }}.to_json
-    end
-  end
-
-
-
-  # real routes
-  get '/summary' do
-    headers_get
-    begin
-      data = Summary.endpoint(params)
       raise Exception.new('no results found') if data.length.zero?
       ha = { count: data.limit(nil).count(1), returned: data.length, data: data, error: nil }
       serve_data(ha, data)
