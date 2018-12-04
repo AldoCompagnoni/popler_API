@@ -19,6 +19,8 @@ https://popler.space/
 https://popler.space/heartbeat/
 https://popler.space/summary/
 https://popler.space/search?proj_metadata_key=3
+https://popler.space/search?proj_metadata_key=3&genus=Strongylocentrotus
+https://popler.space/search?proj_metadata_key=3&genus=Strongylocentrotus&species=franciscanus
 ```
 
 ## Local development
