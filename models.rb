@@ -111,70 +111,95 @@ end
 class Count < ActiveRecord::Base
   self.table_name = 'count_table'
   def self.endpoint(params)
+    fields = %w{proj_metadata_key genus species lterid}
     common_cols = %w(authors authors_contact year day month sppcode genus species datatype spatial_replication_level_1_label spatial_replication_level_1 spatial_replication_level_2_label spatial_replication_level_2 spatial_replication_level_3_label spatial_replication_level_3 spatial_replication_level_4_label spatial_replication_level_4 spatial_replication_level_5_label spatial_replication_level_5 proj_metadata_key structure_type_1 structure_type_2 structure_type_3 structure_type_4 count_table.treatment_type_1 count_table.treatment_type_2 count_table.treatment_type_3 covariates count_observation)
-    select(common_cols.join(', '))
+    query = select(common_cols.join(', '))
       .joins("JOIN taxa_table  ON count_table.taxa_count_fkey = taxa_table.taxa_table_key")
       .joins("JOIN site_in_project_table ON taxa_table.site_in_project_taxa_key = site_in_project_table.site_in_project_key")
       .joins("JOIN project_table ON site_in_project_table.project_table_fkey = project_table.proj_metadata_key")
       .joins("JOIN study_site_table ON site_in_project_table.study_site_table_fkey = study_site_table.study_site_key")
       .joins("JOIN lter_table ON study_site_table.lter_table_fkey = lter_table.lterid")
-      .where(sprintf("proj_metadata_key = %s", params[:proj_metadata_key]))
+      .where("proj_metadata_key = ?", params[:proj_metadata_key])
+    query = query.where('genus = ?', params[:genus]) if params[:genus].present?
+    query = query.where('species = ?', params[:species]) if params[:species].present?
+    query = query.where('lterid = ?', params[:lterid]) if params[:lterid].present?
+    query
   end
 end
 
 class Biomass < ActiveRecord::Base
   self.table_name = 'biomass_table'
   def self.endpoint(params)
+    fields = %w{proj_metadata_key genus species lterid}
     common_cols = %w(authors authors_contact year day month sppcode genus species datatype spatial_replication_level_1_label spatial_replication_level_1 spatial_replication_level_2_label spatial_replication_level_2 spatial_replication_level_3_label spatial_replication_level_3 spatial_replication_level_4_label spatial_replication_level_4 spatial_replication_level_5_label spatial_replication_level_5 proj_metadata_key structure_type_1 structure_type_2 structure_type_3 structure_type_4 biomass_table.treatment_type_1 biomass_table.treatment_type_2 biomass_table.treatment_type_3 covariates biomass_observation)
-    select(common_cols.join(', '))
+    query = select(common_cols.join(', '))
       .joins("JOIN taxa_table ON biomass_table.taxa_biomass_fkey = taxa_table.taxa_table_key")
       .joins("JOIN site_in_project_table ON taxa_table.site_in_project_taxa_key = site_in_project_table.site_in_project_key")
       .joins("JOIN project_table ON site_in_project_table.project_table_fkey = project_table.proj_metadata_key")
       .joins("JOIN study_site_table ON site_in_project_table.study_site_table_fkey = study_site_table.study_site_key")
       .joins("JOIN lter_table ON study_site_table.lter_table_fkey = lter_table.lterid")
-      .where(sprintf("proj_metadata_key = %s", params[:proj_metadata_key]))
+      .where("proj_metadata_key = ?", params[:proj_metadata_key])
+    query = query.where('genus = ?', params[:genus]) if params[:genus].present?
+    query = query.where('species = ?', params[:species]) if params[:species].present?
+    query = query.where('lterid = ?', params[:lterid]) if params[:lterid].present?
+    query
   end
 end
 
 class PercentCover < ActiveRecord::Base
   self.table_name = 'percent_cover_table'
   def self.endpoint(params)
+    fields = %w{proj_metadata_key genus species lterid}
     common_cols = %w(authors authors_contact year day month sppcode genus species datatype spatial_replication_level_1_label spatial_replication_level_1 spatial_replication_level_2_label spatial_replication_level_2 spatial_replication_level_3_label spatial_replication_level_3 spatial_replication_level_4_label spatial_replication_level_4 spatial_replication_level_5_label spatial_replication_level_5 proj_metadata_key structure_type_1 structure_type_2 structure_type_3 structure_type_4 percent_cover_table.treatment_type_1 percent_cover_table.treatment_type_2 percent_cover_table.treatment_type_3 covariates percent_cover_observation)
-    select(common_cols.join(', '))
+    query = select(common_cols.join(', '))
       .joins("JOIN taxa_table ON percent_cover_table.taxa_percent_cover_fkey  = taxa_table.taxa_table_key")
       .joins("JOIN site_in_project_table ON taxa_table.site_in_project_taxa_key = site_in_project_table.site_in_project_key")
       .joins("JOIN project_table ON site_in_project_table.project_table_fkey = project_table.proj_metadata_key")
       .joins("JOIN study_site_table ON site_in_project_table.study_site_table_fkey = study_site_table.study_site_key")
       .joins("JOIN lter_table ON study_site_table.lter_table_fkey = lter_table.lterid")
-      .where(sprintf("proj_metadata_key = %s", params[:proj_metadata_key]))
+      .where("proj_metadata_key = ?", params[:proj_metadata_key])
+    query = query.where('genus = ?', params[:genus]) if params[:genus].present?
+    query = query.where('species = ?', params[:species]) if params[:species].present?
+    query = query.where('lterid = ?', params[:lterid]) if params[:lterid].present?
+    query
   end
 end
 
 class Individual < ActiveRecord::Base
   self.table_name = 'individual_table'
   def self.endpoint(params)
+    fields = %w{proj_metadata_key genus species lterid}
     common_cols = %w(authors authors_contact year day month sppcode genus species datatype spatial_replication_level_1_label spatial_replication_level_1 spatial_replication_level_2_label spatial_replication_level_2 spatial_replication_level_3_label spatial_replication_level_3 spatial_replication_level_4_label spatial_replication_level_4 spatial_replication_level_5_label spatial_replication_level_5 proj_metadata_key structure_type_1 structure_type_2 structure_type_3 structure_type_4 individual_table.treatment_type_1 individual_table.treatment_type_2 individual_table.treatment_type_3 covariates individual_observation)
-    select(common_cols.join(', '))
+    query = select(common_cols.join(', '))
       .joins("JOIN taxa_table ON individual_table.taxa_individual_fkey = taxa_table.taxa_table_key")
       .joins("JOIN site_in_project_table ON taxa_table.site_in_project_taxa_key = site_in_project_table.site_in_project_key")
       .joins("JOIN project_table ON site_in_project_table.project_table_fkey = project_table.proj_metadata_key")
       .joins("JOIN study_site_table ON site_in_project_table.study_site_table_fkey = study_site_table.study_site_key")
       .joins("JOIN lter_table ON study_site_table.lter_table_fkey = lter_table.lterid")
-      .where(sprintf("proj_metadata_key = %s", params[:proj_metadata_key]))
+      .where("proj_metadata_key = ?", params[:proj_metadata_key])
+    query = query.where('genus = ?', params[:genus]) if params[:genus].present?
+    query = query.where('species = ?', params[:species]) if params[:species].present?
+    query = query.where('lterid = ?', params[:lterid]) if params[:lterid].present?
+    query
   end
 end
 
 class Density < ActiveRecord::Base
   self.table_name = 'density_table'
   def self.endpoint(params)
+    fields = %w{proj_metadata_key genus species lterid}
     common_cols = %w(authors authors_contact year day month sppcode genus species datatype spatial_replication_level_1_label spatial_replication_level_1 spatial_replication_level_2_label spatial_replication_level_2 spatial_replication_level_3_label spatial_replication_level_3 spatial_replication_level_4_label spatial_replication_level_4 spatial_replication_level_5_label spatial_replication_level_5 proj_metadata_key structure_type_1 structure_type_2 structure_type_3 structure_type_4 density_table.treatment_type_1 density_table.treatment_type_2 density_table.treatment_type_3 covariates density_observation)
-    select(common_cols.join(', '))
+    query = select(common_cols.join(', '))
       .joins("JOIN taxa_table  ON density_table.taxa_density_fkey = taxa_table.taxa_table_key")
       .joins("JOIN site_in_project_table ON taxa_table.site_in_project_taxa_key = site_in_project_table.site_in_project_key")
       .joins("JOIN project_table ON site_in_project_table.project_table_fkey = project_table.proj_metadata_key")
       .joins("JOIN study_site_table ON site_in_project_table.study_site_table_fkey = study_site_table.study_site_key")
       .joins("JOIN lter_table ON study_site_table.lter_table_fkey = lter_table.lterid")
-      .where(sprintf("proj_metadata_key = %s", params[:proj_metadata_key]))
+      .where("proj_metadata_key = ?", params[:proj_metadata_key])
+    query = query.where('genus = ?', params[:genus]) if params[:genus].present?
+    query = query.where('species = ?', params[:species]) if params[:species].present?
+    query = query.where('lterid = ?', params[:lterid]) if params[:lterid].present?
+    query
   end
 end
 
