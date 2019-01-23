@@ -10,7 +10,8 @@ tech:
 * rest framework: Sinatra
 * database: postgres
 * server: caddy
-* container: all wrapped up in docker (docker-compose)
+
+**NOTE**: The deployed API doesn't actually use docker as the instance was too small to support Docker. But the Ruby/Sinata/postgres/puma/caddy/etc. setup still applies.
 
 ## JSON API examples
 
