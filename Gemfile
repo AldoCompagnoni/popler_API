@@ -1,7 +1,7 @@
 source "http://rubygems.org/"
 ruby "2.5.1"
 
-gem 'rake', '~> 12.3', '>= 12.3.1'
+gem 'rake', '~> 12.3'
 gem 'faraday', '~> 0.15.2'
 gem 'multi_json', '~> 1.13', '>= 1.13.1'
 gem 'sinatra', '~> 2.0', '>= 2.0.3'
