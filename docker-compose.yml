@@ -1,32 +1,6 @@
 version: '2.1'
 services:
-  postgres:
-    image: postgres:latest
-    ports:
-      - "5433:5432"
-    environment:
-      - POSTGRES_USER=power_user
-      - POSTGRES_PASSWORD=popler
-      - POSTGRES_DB=popler_3
-    restart: always
-    volumes:
-      - $HOME/data/popler_3:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   api:
     build: .
     ports:
       - "8834:8834"
-    links:
-      - postgres
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-# create volumes if they don't exist already
-volumes:
-  db_volume: 
